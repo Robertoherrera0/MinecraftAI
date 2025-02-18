@@ -1,0 +1,7 @@
+.dist
+.gradle/
+env/
+gradle/
+logs/
+gradlew
+gradlew.bat
