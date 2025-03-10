@@ -5,7 +5,8 @@ Capstone project
 
 # installing 0.3.7
 - you should be able to automatically install all of the requirements using requirements.txt in the command line
-- also, other than those requirements the only thing I did was edit the first
+- also, other than those requirements the only thing I did was edit the first 26 lines on this file
+- (it is in my virtual environment folder in my MineRL folder on my desktop):  C:\Users\luked\OneDrive\Desktop\Test\myenv\Lib\site-packages\minerl\env\Malmo\Minecraft\build.gradle
 
 ```python
  repositories {
