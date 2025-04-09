@@ -42,7 +42,7 @@ class FlattenObservationWrapper(gym.ObservationWrapper):
         pov = cv2.resize(pov, (self.resize[1], self.resize[0]))
         pov = pov.astype(np.uint8)
 
-        # 2) Flatten the selected inventory items
+        # Flatten the selected inventory items
         inventory_vec = []
         inventory_dict = obs.get("inventory", {})
         for item in self.inv_items:
