@@ -70,48 +70,115 @@
 # else:
 #     print("Log inventory or camera actions not found in dataset!")
 
+# import minerl
+# import gym
+# import numpy as np
+
+# # Load MineRL environment
+# env = gym.make("MineRLTreechop-v0")  # Environment for chopping trees
+# obs, _ = env.reset()
+
+# # Path to dataset (Update this with your actual path)
+# DATASET_PATH = "../MineRLObtainDiamond-v0/v3_absolute_grape_changeling-6_37339-46767/rendered.npz"
+
+# # Load dataset
+# try:
+#     data = np.load(DATASET_PATH)
+#     print("Dataset loaded successfully!")
+# except Exception as e:
+#     print(f"Error loading dataset: {e}")
+#     exit()
+
+# # Extract relevant actions from dataset
+# if 'action$forward' in data and 'action$attack' in data:
+#     forward_actions = data['action$forward']
+#     attack_actions = data['action$attack']
+#     camera_actions = data.get('action$camera', None)  # Optional camera movement
+
+#     print("Replaying actions...")
+
+#     for i in range(len(forward_actions)):  # Replay dataset actions
+#         action = env.action_space.noop()  # Start with a no-op action
+
+#         action['forward'] = forward_actions[i]
+#         action['attack'] = attack_actions[i]
+
+#         if camera_actions is not None:  # Apply camera movement if available
+#             action['camera'] = camera_actions[i]
+
+#         obs, reward, done, truncated, _ = env.step(action)
+#         env.render()  # Renders the environment
+
+#         if done:
+#             print("Episode finished, resetting environment.")
+#             obs, _ = env.reset()
+
+# # Close environment after execution
+# env.close()
+
+# if __name__ == '__main__':
+#     import gym
+#     import minerl
+#     import numpy as np
+    
+#     # Create MineRL environment (without render_mode)
+#     env = gym.make("MineRLTreechop-v0")  
+
+#     # Reset the environment
+#     obs, info = env.reset()
+
+#     # Load dataset (Update the path)
+#     DATASET_PATH = "../MineRLObtainDiamond-v0/v3_absolute_grape_changeling-6_37339-46767/rendered.npz"
+
+#     try:
+#         data = np.load(DATASET_PATH)
+#         print("Dataset loaded successfully!")
+#     except Exception as e:
+#         print(f"Error loading dataset: {e}")
+#         exit()
+
+#     # Extract actions from dataset
+#     if 'action$forward' in data and 'action$attack' in data:
+#         forward_actions = data['action$forward']
+#         attack_actions = data['action$attack']
+#         camera_actions = data.get('action$camera', None)  # Optional camera movement
+
+#         print("Replaying dataset actions...")
+
+#         for i in range(len(forward_actions)):  
+#             action = env.action_space.noop()  # Get a no-op action
+
+#             action['forward'] = forward_actions[i]
+#             action['attack'] = attack_actions[i]
+
+#             if camera_actions is not None:  
+#                 action['camera'] = camera_actions[i]
+
+#             # Step through the environment
+#             obs, reward, done, truncated, _ = env.step(action)
+
+#             env.render()  # Ensure rendering happens
+
+#             if done:
+#                 print("Episode finished, resetting environment.")
+#                 obs, _ = env.reset()
+
+#     env.close()  # Close environment after execution
+
 import minerl
-import gym
-import numpy as np
+import os
 
-# Load MineRL environment
-env = gym.make("MineRLTreechop-v0")  # Environment for chopping trees
-obs, _ = env.reset()
+# Set the dataset path manually in Python
+os.environ["MINERL_DATA_ROOT"] = "C:\\Users\\luked\\OneDrive\\Desktop\\Test\\"
 
-# Path to dataset (Update this with your actual path)
-DATASET_PATH = "../MineRLObtainDiamond-v0/v3_absolute_grape_changeling-6_37339-46767/rendered.npz"
-
-# Load dataset
+# Initialize dataset loader
 try:
-    data = np.load(DATASET_PATH)
-    print("Dataset loaded successfully!")
+    data = minerl.data.make('MineRLTreechop-v0')
+    print("MineRL Data Loader is using the correct dataset path!")
+
+    # Try loading a batch to verify it works
+    batch = next(data.batch_iter(batch_size=1, num_epochs=1, seq_len=1))
+    print("Sample batch loaded successfully!")
+
 except Exception as e:
     print(f"Error loading dataset: {e}")
-    exit()
-
-# Extract relevant actions from dataset
-if 'action$forward' in data and 'action$attack' in data:
-    forward_actions = data['action$forward']
-    attack_actions = data['action$attack']
-    camera_actions = data.get('action$camera', None)  # Optional camera movement
-
-    print("Replaying actions...")
-
-    for i in range(len(forward_actions)):  # Replay dataset actions
-        action = env.action_space.noop()  # Start with a no-op action
-
-        action['forward'] = forward_actions[i]
-        action['attack'] = attack_actions[i]
-
-        if camera_actions is not None:  # Apply camera movement if available
-            action['camera'] = camera_actions[i]
-
-        obs, reward, done, truncated, _ = env.step(action)
-        env.render()  # Renders the environment
-
-        if done:
-            print("Episode finished, resetting environment.")
-            obs, _ = env.reset()
-
-# Close environment after execution
-env.close()
