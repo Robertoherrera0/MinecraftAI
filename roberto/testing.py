@@ -26,7 +26,6 @@ def main():
         action, _ = model.predict(obs)
         obs, reward, done, _ = env.step(action)
 
-        # Render the current frame
         env.render()
 
         logs = obs["inv"][0]
