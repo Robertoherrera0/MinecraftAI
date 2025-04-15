@@ -13,6 +13,8 @@ def make_env(debug=False):
     env = LogRewardWrapper(env, debug=debug)
     return env
 
+import matplotlib.pyplot as plt  # Add this at the top
+
 def main():
     print("Loading environment and model...")
     env = make_env(debug=False)
@@ -20,6 +22,7 @@ def main():
 
     obs = env.reset()
     max_logs = 0
+    rewards = []  # ✅ Store rewards
 
     print("Starting rendering...")
     for step in range(1000):
@@ -30,6 +33,7 @@ def main():
 
         logs = obs["inv"][0]
         max_logs = max(max_logs, logs)
+        rewards.append(reward)  # ✅ Add to rewards list
 
         print(f"[STEP {step}] Reward: {reward:.2f} | Logs: {logs}")
 
@@ -39,6 +43,17 @@ def main():
 
     print(f"\nMax logs collected: {max_logs}")
     env.close()
+
+    # ✅ Plot the rewards
+    plt.figure(figsize=(10, 5))
+    plt.plot(rewards, label="Reward per step")
+    plt.xlabel("Step")
+    plt.ylabel("Reward")
+    plt.title("PPO Agent Step-wise Rewards")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
 
 if __name__ == "__main__":
     main()
