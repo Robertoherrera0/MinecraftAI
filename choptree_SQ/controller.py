@@ -140,3 +140,5 @@ meta = {
 with open(os.path.join(episode_dir, "meta.pkl"), "wb") as f:
     pickle.dump(meta, f)
 print(f"Metadata saved to: {episode_dir}/meta.pkl")
+print(f"Total number of steps taken: {len(actions)}")
+
