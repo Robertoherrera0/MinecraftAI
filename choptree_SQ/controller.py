@@ -110,7 +110,7 @@ while not exit_flag:
     actions.append({
         "obs": wrapped_obs,
         "action": wrapped_action,
-        "reward": 0.0,
+        "reward": reward,
         "next_obs": wrapped_next_obs,
         "done": done,
         "total_reward": total_reward
