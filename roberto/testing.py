@@ -25,7 +25,7 @@ def main():
     rewards = []  # ✅ Store rewards
 
     print("Starting rendering...")
-    for step in range(1000):
+    for step in range(10000):
         action, _ = model.predict(obs)
         obs, reward, done, _ = env.step(action)
 
