@@ -93,7 +93,7 @@ print("\nControlling the agent. Press 'q' to quit and save the episode.\n"
 actions = []
 total_reward = 0
 
-while not exit_flag:
+while not exit_flag or len(actions) == 1000:
     raw_action = get_action()
     raw_next_obs, reward, done, _ = env.step(raw_action)
 
