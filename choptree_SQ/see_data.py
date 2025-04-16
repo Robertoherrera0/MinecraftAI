@@ -3,15 +3,15 @@ from action_wrapper import DictToMultiDiscreteWrapper
 import gym
 import minerl
 
-number = "002"
+number = "016"
 with open("human-demonstrations/episode_"+number+"/meta.pkl", "rb") as f:
     meta = pickle.load(f)
 
 with open("human-demonstrations/episode_"+number+"/actions.pkl", "rb") as f:
     data = pickle.load(f)
 
-start = 999
-end = 1000
+start = 1560
+end = 1578
 
 print("\n")
 for item, value in meta.items():

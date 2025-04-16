@@ -1,6 +1,6 @@
 import gym
 import minerl
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO #type: ignore
 
 from obs_wrapper import FlattenObservationWrapper
 from action_wrapper import DictToMultiDiscreteWrapper
@@ -22,7 +22,7 @@ def main():
 
     obs = env.reset()
     max_logs = 0
-    rewards = []  # ✅ Store rewards
+    rewards = []  # Store rewards
 
     print("Starting rendering...")
     for step in range(10000):
@@ -33,7 +33,7 @@ def main():
 
         logs = obs["inv"][0]
         max_logs = max(max_logs, logs)
-        rewards.append(reward)  # ✅ Add to rewards list
+        rewards.append(reward)  # sAdd to rewards list
 
         print(f"[STEP {step}] Reward: {reward:.2f} | Logs: {logs}")
 
