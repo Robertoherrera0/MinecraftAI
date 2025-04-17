@@ -119,8 +119,13 @@ while not exit_flag:
     obs = raw_next_obs
     env.render()
 
+    if len(actions) >= 1500:
+        print("Reached 1500 steps, exiting...")
+        exit_flag = True
+
     if done:
         obs = env.reset()
+
 
 env.close()
 
