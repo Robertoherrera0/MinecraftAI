@@ -7,14 +7,16 @@ import re
 import cv2
 from pynput import keyboard
 from reward_wrapper import LogRewardWrapper
-
+from custom_reward_wrapper import CustomRewardWrapper
 INVENTORY_KEYS = ["log"]
 CAMERA_BINS = 21
 CAMERA_CENTER = CAMERA_BINS // 2
-CREDIT_WINDOW = 10
+CREDIT_WINDOW =10
+CAMERA_RANGE = 10.0
+ACTION_KEYS = ["attack", "back", "forward", "jump", "left", "right"]
 
 base_env = gym.make("MineRLObtainDiamondShovel-v0")
-env = LogRewardWrapper(base_env)
+env =  CustomRewardWrapper(base_env)
 obs = env.reset()
 
 root_dir = "human-demonstrations"
@@ -31,7 +33,7 @@ exit_flag = False
 CAMERA_SPEED = 2.0
 
 def get_action():
-    act = env.action_space.no_op()
+    act = {k: 0 for k in ACTION_KEYS}
     if 'w' in keys_pressed: act['forward'] = 1
     if 'a' in keys_pressed: act['left'] = 1
     if 'd' in keys_pressed: act['right'] = 1
@@ -56,14 +58,17 @@ def flatten_observation(obs):
     return {"pov": pov, "inv": inv_vec}
 
 def dict_to_multidiscrete(action):
-    keys = sorted([k for k in action if k != "camera"])
-    action_vec = [action[k] for k in keys]
+    action_vec = [action[k] for k in ACTION_KEYS]
 
     pitch = action["camera"][0]
     yaw = action["camera"][1]
+
+    pitch_bin = int(round((pitch / CAMERA_RANGE) * (CAMERA_CENTER))) + CAMERA_CENTER
+    yaw_bin   = int(round((yaw   / CAMERA_RANGE) * (CAMERA_CENTER))) + CAMERA_CENTER
+
     pitch_bin = int(np.clip(np.round(pitch) + CAMERA_CENTER, 0, CAMERA_BINS - 1))
     yaw_bin = int(np.clip(np.round(yaw) + CAMERA_CENTER, 0, CAMERA_BINS - 1))
-
+    
     action_vec.extend([yaw_bin, pitch_bin])
     return np.array(action_vec, dtype=np.int32)
 
@@ -93,7 +98,7 @@ print("\nControlling the agent. Press 'q' to quit and save the episode.\n"
 actions = []
 total_reward = 0
 
-while not exit_flag or len(actions) == 1000:
+while not exit_flag and len(actions) < 1500:
     raw_action = get_action()
     raw_next_obs, reward, done, _ = env.step(raw_action)
 
@@ -121,7 +126,7 @@ while not exit_flag or len(actions) == 1000:
 
     if len(actions) >= 1500:
         print("Reached 1500 steps, exiting...")
-        exit_flag = True
+        break
 
     if done:
         obs = env.reset()

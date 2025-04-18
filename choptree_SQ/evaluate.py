@@ -1,56 +1,74 @@
 import gym
-import minerl
-import torch
 import numpy as np
+import matplotlib.pyplot as plt
 from stable_baselines3 import PPO
+from custom_reward_wrapper import CustomRewardWrapper
+from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
+import minerl
 
-from obs_wrapper import FlattenObservationWrapper
-from action_wrapper import DictToMultiDiscreteWrapper
-from reward_wrapper import LogRewardWrapper
+CHECKPOINT_PATH = "checkpoints/ppo_bc_10000_steps"  # we need to change train_rl so that it saves more regularly.
 
-def make_env(debug=False):
+def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
-    env = DictToMultiDiscreteWrapper(env)
-    env = FlattenObservationWrapper(env, inv_items=["log"])
-    env = LogRewardWrapper(env, debug=debug)
+    env = CustomRewardWrapper(env)
+    env = FlattenObservationWrapper(env)
+    env = MultiDiscreteToDictActionWrapper(env)
     return env
 
-def load_bc_model(model_path):
-    # Load the behavior cloning model
-    model = torch.load(model_path)  # Load the trained model from the path
-    model.eval()  # Set the model to evaluation mode
-    return model
-
 def main():
-    print("Loading environment and model...")
-    env = make_env(debug=False)
+    print("Loading environment and PPO model...")
+    env = make_env()
+    model = PPO.load(CHECKPOINT_PATH)
 
-    # Load the pre-trained behavior cloning model
-    bc_model = load_bc_model("/models/bc_model.pth")  # Adjust the path to where the model is saved
+    # get raw env for render
+    raw_env = env.envs[0] if hasattr(env, "envs") else env
 
     obs = env.reset()
-    max_logs = 0
+    total_reward = 0
+    rewards = []
+    yaw_bins = []
+    pitch_bins = []
+    step = 0
 
-    print("Starting rendering...")
-    for step in range(1000):
-        # Get the action from the behavior cloning model
-        observation_tensor = torch.tensor(obs['pov'].flatten(), dtype=torch.float32).unsqueeze(0)  # Add batch dimension
-        action = bc_model(observation_tensor).argmax(dim=-1).item()  # Get the action with max probability
-
+    while True:
+        action, _ = model.predict(obs, deterministic=True)
         obs, reward, done, _ = env.step(action)
-        env.render()
 
-        logs = obs["inv"][0]
-        max_logs = max(max_logs, logs)
+        raw_env.render()  
 
-        print(f"[STEP {step}] Reward: {reward:.2f} | Logs: {logs}")
+        total_reward += reward
+        rewards.append(total_reward)
+        pitch_bins.append(action[-2])  # pitch
+        yaw_bins.append(action[-1])    # yaw
 
-        if done:
-            print("Done. Resetting environment...\n")
-            obs = env.reset()
+        print(f"[STEP {step}] Reward: {reward:.2f} | Pitch: {pitch_bins[-1]} | Yaw: {yaw_bins[-1]}")
+        step += 1
 
-    print(f"\nMax logs collected: {max_logs}")
+        if done or step >= 1500:
+            break
+
     env.close()
+    print(f"Evaluation done | Steps: {step} | Total reward: {total_reward}")
+
+    # --- Plotting ---
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(rewards)
+    plt.title("Cumulative Reward")
+    plt.xlabel("Step")
+    plt.ylabel("Total Reward")
+
+    plt.subplot(1, 2, 2)
+    plt.plot(yaw_bins, label="Yaw")
+    plt.plot(pitch_bins, label="Pitch")
+    plt.title("Camera Movement (Yaw / Pitch)")
+    plt.xlabel("Step")
+    plt.ylabel("Camera Bin")
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     main()
