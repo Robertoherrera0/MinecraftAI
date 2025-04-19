@@ -92,12 +92,12 @@ def main():
     if good_eps:
         print("Processing good episodes ...")
         processed_good = preprocess_data(good_eps)
-        save_processed_data(processed_good, "processed_good.pkl")
+        save_processed_data(processed_good, "processed_data/processed_good.pkl")
 
     if bad_eps:
         print("Processing bad episodes ...")
         processed_bad = preprocess_data(bad_eps)
-        save_processed_data(processed_bad, "processed_bad.pkl")
+        save_processed_data(processed_bad, "processed_data/processed_bad.pkl")
 
 if __name__ == "__main__":
     main()
