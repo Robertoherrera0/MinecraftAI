@@ -1,3 +1,4 @@
+
 # wrappers.py
 import gym
 import numpy as np
@@ -32,5 +33,5 @@ class MultiDiscreteToDictActionWrapper(gym.ActionWrapper):
     def action(self, action):
         act = {k: int(action[i]) for i, k in enumerate(self.action_keys)}
         yaw_bin, pitch_bin = action[-2], action[-1]
-        act["camera"] = np.array([pitch_bin - CAMERA_CENTER, yaw_bin - CAMERA_CENTER], dtype=np.float32)
+        act["camera"] = np.array([yaw_bin - CAMERA_CENTER, pitch_bin - CAMERA_CENTER], dtype=np.float32)
         return act

@@ -1,3 +1,4 @@
+
 import gym
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,7 +7,8 @@ from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 import minerl
 
-CHECKPOINT_PATH = "ppo_bc_model" 
+CHECKPOINT_PATH = "checkpoints/ppo_bc_8000_steps" 
+MODEL_PATH = "models/ppo_bc_model" 
 
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
@@ -18,7 +20,7 @@ def make_env():
 def main():
     print("Loading environment and PPO model...")
     env = make_env()
-    model = PPO.load(CHECKPOINT_PATH)
+    model = PPO.load(MODEL_PATH)
 
     # get raw env for render
     raw_env = env.envs[0] if hasattr(env, "envs") else env
@@ -31,7 +33,7 @@ def main():
     step = 0
 
     while True:
-        action, _ = model.predict(obs, deterministic=True)
+        action, _ = model.predict(obs)
         obs, reward, done, _ = env.step(action)
 
         raw_env.render()  
