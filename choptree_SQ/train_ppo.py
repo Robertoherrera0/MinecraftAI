@@ -6,7 +6,8 @@ from torch import nn
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
-from stable_baselines3.common.callbacks import CheckpointCallback
+from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
+
 from train_bc import PolicyNetwork
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
@@ -49,12 +50,26 @@ def make_env():
 
 vec_env = make_vec_env(make_env, n_envs=1)
 
-# Save regularly 
+# stop training
+class Stop(BaseCallback):
+    def __init__(self, max_steps, verbose=0):
+        super().__init__(verbose)
+        self.max_steps = max_steps
+
+    def _on_step(self) -> bool:
+        return self.num_timesteps < self.max_steps
+
+# save regularly 
 checkpoint_callback = CheckpointCallback(
     save_freq=4000,
     save_path="./checkpoints/",
     name_prefix="ppo_bc"
 )
+
+callback = CallbackList([
+    Stop(max_steps=17500),
+    checkpoint_callback
+])
 
 # Train PPO starting from BC model
 def train_PPO_model():
@@ -67,10 +82,11 @@ def train_PPO_model():
 
     model.learn(
         total_timesteps=17500,
-        callback=checkpoint_callback,
-        reset_num_timesteps=True,
+        callback=callback,
+        reset_num_timesteps=False,
         progress_bar=True
     )
+
     model.save(MODEL_PATH)
     print(f"PPO fine-tuning done. Model saved to: {MODEL_PATH}")
 
