@@ -90,9 +90,9 @@ def main():
     output_dim = actions.shape[1]
 
     model = PolicyNetwork(input_dim, output_dim)
-    if os.path.exists("model/bc_model.pth"):
+    if os.path.exists("models/bc_model.pth"):
         print("Loading existing BC model...")
-        model.load_state_dict(torch.load("model/bc_model.pth"))
+        model.load_state_dict(torch.load("models/bc_model.pth"))
 
     train_bc_model(model, observations, actions, num_epochs=100, batch_size=64)
     save_model(model)
