@@ -1,11 +1,11 @@
-import minerl
+import minerl  #type: ignore
 import gym
 import os
 import numpy as np
 import pickle
 import re
 import cv2
-from pynput import keyboard
+from pynput import keyboard #type: ignore
 from reward_wrapper import LogRewardWrapper
 from custom_reward_wrapper import CustomRewardWrapper
 INVENTORY_KEYS = ["log"]
