@@ -5,8 +5,10 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from tqdm.auto import tqdm
+import matplotlib.pyplot as plt
+import os 
 
-def load_processed_data(filename="processed_good.pkl"):
+def load_processed_data(filename="processed_data/processed_good.pkl"):
     with open(filename, 'rb') as f:
         data = pickle.load(f)
     print("Loaded processed data.")
@@ -37,13 +39,15 @@ class DemoDataset(Dataset):
         action = torch.tensor(self.actions[idx], dtype=torch.float32)
         return obs, action
 
-def train_bc_model(model, observations, actions_data, num_epochs=50, batch_size=64):
+def train_bc_model(model, observations, actions_data, num_epochs=200, batch_size=64):
     demo_dataset = DemoDataset(observations, actions_data)
     dataloader = DataLoader(demo_dataset, batch_size=batch_size, shuffle=True)
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
     loss_fn = nn.MSELoss()
 
-    for epoch in tqdm(range(num_epochs)):
+    epoch_losses = []
+
+    for epoch in range(num_epochs):
         model.train()
         total_loss = 0
         for obs, action in dataloader:
@@ -53,9 +57,21 @@ def train_bc_model(model, observations, actions_data, num_epochs=50, batch_size=
             total_loss += loss.item()
             loss.backward()
             optimizer.step()
-        print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {total_loss / len(dataloader)}")
+        avg_loss = total_loss / len(dataloader)
+        epoch_losses.append(avg_loss)
+        print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {avg_loss:.6f}")
 
-def save_model(model, filename="bc_model.pth"):
+    # Plot log-scale loss
+    plt.figure()
+    plt.semilogy(epoch_losses)
+    plt.xlabel("Epoch")
+    plt.ylabel("Training Loss")
+    plt.title("BC Loss Over Epochs")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+def save_model(model, filename="models/bc_model.pth"):
     torch.save(model.state_dict(), filename)
     print(f"Model saved to {filename}")
 
@@ -72,9 +88,13 @@ def main():
 
     input_dim = observations.shape[1]
     output_dim = actions.shape[1]
-    model = PolicyNetwork(input_dim, output_dim)
 
-    train_bc_model(model, observations, actions, num_epochs=50, batch_size=64)
+    model = PolicyNetwork(input_dim, output_dim)
+    if os.path.exists("model/bc_model.pth"):
+        print("Loading existing BC model...")
+        model.load_state_dict(torch.load("model/bc_model.pth"))
+
+    train_bc_model(model, observations, actions, num_epochs=100, batch_size=64)
     save_model(model)
 
 

@@ -6,7 +6,7 @@ from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 import minerl
 
-CHECKPOINT_PATH = "ppo_bc_model" 
+CHECKPOINT_PATH = "checkpoints/ppo_bc_4000_steps" 
 
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
