@@ -84,7 +84,7 @@ def train_PPO_model():
     model.learn(
         total_timesteps=17500,
         callback=callback,
-        reset_num_timesteps=False,
+        reset_num_timesteps=True,
         progress_bar=True
     )
 
@@ -96,3 +96,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

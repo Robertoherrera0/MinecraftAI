@@ -1,3 +1,4 @@
+
 import gym
 import torch
 import numpy as np
@@ -52,6 +53,7 @@ model = SAC(
     tensorboard_log="./tb_logs"
 )
 
-model.learn(total_timesteps=18000, callback=checkpoint_callback)
-model.save("softq_finetuned_bc")
+model.learn(total_timesteps=17500, callback=checkpoint_callback)
+model.save("models/softq_bc")
 print("Soft Q fine-tuning done. Model saved to: softq_finetuned_bc")
+
