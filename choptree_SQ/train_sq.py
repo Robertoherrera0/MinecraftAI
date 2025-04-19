@@ -10,6 +10,7 @@ from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 from train_bc import PolicyNetwork
+from bc_extractor import BCFeatureExtractor
 import minerl
 
 # --- Constants ---
@@ -19,18 +20,6 @@ CAMERA_CENTER = CAMERA_BINS // 2
 INPUT_DIM = 64 * 64 * 3 + len(INVENTORY_KEYS)
 OUTPUT_DIM = 6 + 2  # 6 discrete buttons + 2 camera bins
 
-# --- Feature Extractor using pretrained BC ---
-class BCFeatureExtractor(BaseFeaturesExtractor):
-    def __init__(self, observation_space, features_dim=128):
-        super().__init__(observation_space, features_dim)
-        self.net = PolicyNetwork(INPUT_DIM, OUTPUT_DIM)
-        self.net.load_state_dict(torch.load("bc_model.pth"))
-        self.net.eval()
-
-    def forward(self, x):
-        return self.net.fc2(torch.relu(self.net.fc1(x)))
-
-# --- Environment ---
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
     env = CustomRewardWrapper(env)

@@ -11,6 +11,7 @@ from stable_baselines3.common.callbacks import BaseCallback, CallbackList, Check
 from train_bc import PolicyNetwork
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
+from bc_extractor import BCFeatureExtractor
 import os
 import minerl
 
@@ -20,24 +21,24 @@ CAMERA_BINS = 21
 CAMERA_CENTER = CAMERA_BINS // 2
 INPUT_DIM = 64 * 64 * 3 + len(INVENTORY_KEYS)
 OUTPUT_DIM = 6 + 2  # 6 binary buttons + 2 camera bins
-MODEL_PATH = "ppo_bc_model"
-BC_MODEL_PATH = "bc_model.pth"
+MODEL_PATH = "models/ppo_bc_model"
+BC_MODEL_PATH = "models/bc_model.pth"
 
-# Load BC model as feature extractor
-class BCFeatureExtractor(BaseFeaturesExtractor):
-    def __init__(self, observation_space, features_dim=128):
-        super().__init__(observation_space, features_dim)
-        self.net = PolicyNetwork(INPUT_DIM, OUTPUT_DIM)
-        self.net.load_state_dict(torch.load(BC_MODEL_PATH))
-        self.net.eval()
+# # Load BC model as feature extractor
+# class BCFeatureExtractor(BaseFeaturesExtractor):
+#     def __init__(self, observation_space, features_dim=128):
+#         super().__init__(observation_space, features_dim)
+#         self.net = PolicyNetwork(INPUT_DIM, OUTPUT_DIM)
+#         self.net.load_state_dict(torch.load(BC_MODEL_PATH))
+#         self.net.eval()
 
-    def forward(self, x):
-        return self.net.fc2(torch.relu(self.net.fc1(x)))
+#     def forward(self, x):
+#         return self.net.fc2(torch.relu(self.net.fc1(x)))
 
 policy_kwargs = dict(
     features_extractor_class=BCFeatureExtractor,
     features_extractor_kwargs=dict(features_dim=128),
-    net_arch=[dict(pi=[64], vf=[64])]
+    net_arch=dict(pi=[64], vf=[64])
 )
 
 # Make environment
