@@ -5,7 +5,7 @@ from sb3_contrib import RecurrentPPO #type:ignore
 import minerl #type:ignore
 
 from custom_reward_wrapper import CustomRewardWrapper
-from wrappers import FlattenObservationWrapperRPPO, MultiDiscreteToDictActionWrapper
+from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 
 # MODEL_PATH = "checkpoints/rppo_bc_4000_steps"
 MODEL_PATH = "models/rppo_bc_model"
@@ -13,7 +13,7 @@ MODEL_PATH = "models/rppo_bc_model"
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
     env = CustomRewardWrapper(env)
-    env = FlattenObservationWrapperRPPO(env)
+    env = FlattenObservationWrapper(env)
     env = MultiDiscreteToDictActionWrapper(env)
     return env
 
@@ -35,7 +35,7 @@ def main():
     episode_starts = np.ones((1,), dtype=bool)
 
     while True:
-        action, lstm_states = model.predict(obs, state=lstm_states, episode_start=episode_starts, deterministic=True)
+        action, lstm_states = model.predict(obs, state=lstm_states, episode_start=episode_starts)
         obs, reward, done, _ = env.step(action)
 
         raw_env.render()
