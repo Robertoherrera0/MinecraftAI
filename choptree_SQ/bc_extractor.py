@@ -1,6 +1,7 @@
 import torch
 from torch import nn
-from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+from stable_baselines3.common.torch_layers import BaseFeaturesExtractor #type:ignore
+
 from train_bc import PolicyNetwork
 
 INPUT_DIM = 64 * 64 * 3 + 1
