@@ -1,16 +1,13 @@
 import gym
 import os
-import torch
-import numpy as np
-from torch import nn
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
-from sb3_contrib import RecurrentPPO
+from stable_baselines3.common.env_util import make_vec_env #type:ignore
+from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback #type:ignore
+from sb3_contrib import RecurrentPPO #type:ignore
 
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapperRPPO, MultiDiscreteToDictActionWrapper
 from bc_extractor import BCFeatureExtractor
-import minerl
+import minerl #type:ignore
 
 # Constants
 INVENTORY_KEYS = ["log"]
