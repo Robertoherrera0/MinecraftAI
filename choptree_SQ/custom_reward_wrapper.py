@@ -1,5 +1,5 @@
 import gym
-
+import numpy as np
 """
 in controller.py replace this 
 
@@ -35,12 +35,11 @@ class CustomRewardWrapper(gym.Wrapper):
         inventory = obs.get("inventory", {})
         reward = 0
 
-        # Reward collecting logs
+        # Inventory-based rewards
         reward += self._delta("log", inventory, weight=1.0)
-        # Reward collecting saplings
         reward += self._delta("sapling", inventory, weight=0.5)
-        # Reward for crafting sticks
         reward += self._delta("stick", inventory, weight=1.5)
+
         # Penalize damage taken (if available)
         new_health = obs.get("life_stats", {}).get("health", self.prev_health)
         if new_health < self.prev_health:
@@ -50,7 +49,85 @@ class CustomRewardWrapper(gym.Wrapper):
         self.prev_inventory = inventory.copy()
 
         if self.debug:
-            print(f"[REWARD] Reward: {reward:.2f}, Inventory: {inventory}")
+            print(f"Reward: {reward:.2f}")
+
+        return obs, reward, done, info
+
+    def _delta(self, key, inventory, weight=1.0):
+        prev = self.prev_inventory.get(key, 0)
+        now = inventory.get(key, 0)
+        diff = now - prev
+        return weight * diff if diff > 0 else 0
+
+
+class CustomRewardWrapperRPPO(gym.Wrapper):
+    def __init__(self, env, debug=False):
+        super().__init__(env)
+        self.prev_inventory = {}
+        self.prev_health = 20 
+        self.prev_camera = np.array([0.0, 0.0])
+        self.debug = debug
+
+        self.tree_items = {
+            "log": 1.0,
+            "stick": 1.5,
+            "sapling": 0.5,
+            "oak_log": 1.0,
+            "birch_log": 1.0,
+            "jungle_log": 1.0,
+            "acacia_log": 1.0,
+            "dark_oak_log": 1.0,
+        }
+
+    def reset(self, **kwargs):
+        obs = self.env.reset(**kwargs)
+        self.prev_inventory = obs.get("inventory", {}).copy()
+        self.prev_health = obs.get("life_stats", {}).get("health", 20)
+        self.prev_camera = np.array([0.0, 0.0])
+        return obs
+
+    def step(self, action):
+        obs, _, done, info = self.env.step(action)
+        reward = 0
+        inventory = obs.get("inventory", {})
+        camera = action.get("camera", np.array([0.0, 0.0]))
+        pitch_delta = abs(camera[0])
+        yaw_delta = abs(camera[1])
+
+        # Reward for collecting tree-related items
+        for item, weight in self.tree_items.items():
+            reward += self._delta(item, inventory, weight=weight)
+
+        # Reward camera movement (encourages looking around)
+        if not np.allclose(camera, self.prev_camera, atol=0.01):
+            reward += 0.0001 * (pitch_delta + yaw_delta)
+        else:
+            reward -= 0.001  # small penalty for twitching the same way
+
+        self.prev_camera = camera.copy()
+
+        # small reward for keeping camera centered
+        pitch_bin = int(camera[0] + 10)
+        yaw_bin = int(camera[1] + 10)
+        if 7 <= pitch_bin <= 14 and 7 <= yaw_bin <= 14:
+            reward += 0.02
+
+        # Penalize pressing opposite movement keys
+        if action.get("forward", 0) and action.get("back", 0):
+            reward -= 0.1
+        if action.get("left", 0) and action.get("right", 0):
+            reward -= 0.1
+
+        # Penalize health loss
+        new_health = obs.get("life_stats", {}).get("health", self.prev_health)
+        if new_health < self.prev_health:
+            reward -= 2.0
+        self.prev_health = new_health
+
+        self.prev_inventory = inventory.copy()
+
+        if self.debug:
+            print(f"Reward: {reward:.2f}  | Camera: {camera}")
 
         return obs, reward, done, info
 
