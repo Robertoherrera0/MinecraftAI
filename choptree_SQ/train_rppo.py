@@ -5,7 +5,7 @@ from stable_baselines3.common.callbacks import BaseCallback, CallbackList, Check
 from sb3_contrib import RecurrentPPO #type:ignore
 
 from custom_reward_wrapper import CustomRewardWrapper
-from wrappers import FlattenObservationWrapperRPPO, MultiDiscreteToDictActionWrapper
+from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 from bc_extractor import BCFeatureExtractor
 import minerl #type:ignore
 
@@ -30,7 +30,7 @@ policy_kwargs = dict(
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
     env = CustomRewardWrapper(env)
-    env = FlattenObservationWrapperRPPO(env)
+    env = FlattenObservationWrapper(env)
     env = MultiDiscreteToDictActionWrapper(env)
     return env
 
