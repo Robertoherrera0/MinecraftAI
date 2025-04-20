@@ -79,8 +79,7 @@ def preprocess_data(episodes):
     }
 
 def save_processed_data(data, filename):
-    with open(filename, 'wb') as f:
-        pickle.dump(data, f)
+    np.savez(filename, **data)
     print(f" Data saved to: {filename}")
 
 def main():
@@ -92,12 +91,12 @@ def main():
     if good_eps:
         print("Processing good episodes ...")
         processed_good = preprocess_data(good_eps)
-        save_processed_data(processed_good, "processed_data/processed_good.pkl")
+        save_processed_data(processed_good, "processed_data/processed_good.npz")
 
     if bad_eps:
         print("Processing bad episodes ...")
         processed_bad = preprocess_data(bad_eps)
-        save_processed_data(processed_bad, "processed_data/processed_bad.pkl")
+        save_processed_data(processed_bad, "processed_data/processed_bad.npz")
 
 if __name__ == "__main__":
     main()

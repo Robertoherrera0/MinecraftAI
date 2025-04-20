@@ -4,7 +4,7 @@ from stable_baselines3.common.env_util import make_vec_env #type:ignore
 from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback #type:ignore
 from sb3_contrib import RecurrentPPO #type:ignore
 
-from custom_reward_wrapper import CustomRewardWrapper
+from custom_reward_wrapper import CustomRewardWrapperRPPO
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 from bc_extractor import BCFeatureExtractor
 import minerl #type:ignore
@@ -29,7 +29,7 @@ policy_kwargs = dict(
 
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
-    env = CustomRewardWrapper(env)
+    env = CustomRewardWrapperRPPO(env)
     env = FlattenObservationWrapper(env)
     env = MultiDiscreteToDictActionWrapper(env)
     return env
@@ -66,7 +66,7 @@ def train_rppo_model():
             env=vec_env,
             verbose=1,
             policy_kwargs=policy_kwargs,
-            tensorboard_log="./tb_logs",
+            ent_coef=0.01
         )
 
 

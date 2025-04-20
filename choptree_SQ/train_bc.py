@@ -8,9 +8,8 @@ from tqdm.auto import tqdm
 import matplotlib.pyplot as plt
 import os 
 
-def load_processed_data(filename="processed_data/processed_good.pkl"):
-    with open(filename, 'rb') as f:
-        data = pickle.load(f)
+def load_processed_data(filename="processed_data/processed_good.npz"):
+    data = np.load(filename)
     print("Loaded processed data.")
     return data
 
@@ -94,7 +93,7 @@ def main():
         print("Loading existing BC model...")
         model.load_state_dict(torch.load("models/bc_model.pth"))
 
-    train_bc_model(model, observations, actions, num_epochs=100, batch_size=64)
+    train_bc_model(model, observations, actions, num_epochs=50, batch_size=64)
     save_model(model)
 
 

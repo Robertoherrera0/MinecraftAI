@@ -9,7 +9,6 @@ INVENTORY_KEYS = ["log"]
 INPUT_DIM = 64 * 64 * 3 + len(INVENTORY_KEYS)
 
 def flatten_observation(obs):
-    import cv2
     pov = obs["pov"][..., :3]
     pov = cv2.resize(pov, (64, 64)).astype(np.uint8)
     inventory = obs.get("inventory", {})
@@ -32,22 +31,7 @@ class MultiDiscreteToDictActionWrapper(gym.ActionWrapper):
 
     def action(self, action):
         act = {k: int(action[i]) for i, k in enumerate(self.action_keys)}
-        yaw_bin, pitch_bin = action[-2], action[-1]
-        act["camera"] = np.array([yaw_bin - CAMERA_CENTER, pitch_bin - CAMERA_CENTER], dtype=np.float32)
+        pitch_bin, yaw_bin = action[-2], action[-1]
+        act["camera"] = np.array([pitch_bin - CAMERA_CENTER, yaw_bin - CAMERA_CENTER], dtype=np.float32)
         return act
     
-
-def flatten_observation_rppo(obs):
-    pov = obs["pov"][..., :3]
-    pov = cv2.resize(pov, (64, 64)).astype(np.float32) / 255.0 
-    inventory = obs.get("inventory", {})
-    inv_vec = np.array([inventory.get(k, 0) for k in INVENTORY_KEYS], dtype=np.float32)
-    return np.concatenate([pov.flatten(), inv_vec])
-
-class FlattenObservationWrapperRPPO(gym.ObservationWrapper):
-    def __init__(self, env):
-        super().__init__(env)
-        self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(INPUT_DIM,), dtype=np.float32)
-
-    def observation(self, obs):
-        return flatten_observation_rppo(obs)

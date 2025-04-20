@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 from sb3_contrib import RecurrentPPO #type:ignore
 import minerl #type:ignore
 
-from custom_reward_wrapper import CustomRewardWrapper
+from custom_reward_wrapper import CustomRewardWrapperRPPO
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 
-# MODEL_PATH = "checkpoints/rppo_bc_4000_steps"
+# MODEL_PATH = "checkpoints/rppo_bc_12000_steps"
 MODEL_PATH = "models/rppo_bc_model"
 
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
-    env = CustomRewardWrapper(env)
+    env = CustomRewardWrapperRPPO(env)
     env = FlattenObservationWrapper(env)
     env = MultiDiscreteToDictActionWrapper(env)
     return env
@@ -45,11 +45,11 @@ def main():
         rewards.append(total_reward)
         pitch_bins.append(action[-2])
         yaw_bins.append(action[-1])
-
-        print(f"[STEP {step}] Reward: {reward:.2f} | Pitch: {pitch_bins[-1]} | Yaw: {yaw_bins[-1]}")
+        print("Full action:", action)
+        print(f"[STEP {step}] Reward: {reward:.5f} | Pitch: {pitch_bins[-1]} | Yaw: {yaw_bins[-1]}")
         step += 1
 
-        if done or step > 3000:
+        if done or step > 10_000:
             break
 
     env.close()
