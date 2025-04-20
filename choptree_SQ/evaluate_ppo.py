@@ -2,10 +2,11 @@
 import gym
 import numpy as np
 import matplotlib.pyplot as plt
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO #type:ignore
+import minerl #type:ignore
+
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
-import minerl
 
 CHECKPOINT_PATH = "checkpoints/ppo_bc_8000_steps" 
 MODEL_PATH = "models/ppo_bc_model" 

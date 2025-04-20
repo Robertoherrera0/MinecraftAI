@@ -1,18 +1,13 @@
 import gym
-import torch
-import numpy as np
-import cv2
-from torch import nn
-from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
-from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
+from stable_baselines3 import PPO #type:ignore
+from stable_baselines3.common.env_util import make_vec_env #type:ignore
+from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback #type:ignore
 
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 from bc_extractor import BCFeatureExtractor
 import os
-import minerl
+import minerl #type:ignore
 
 # Constants
 INVENTORY_KEYS = ["log"]
@@ -22,17 +17,6 @@ INPUT_DIM = 64 * 64 * 3 + len(INVENTORY_KEYS)
 OUTPUT_DIM = 6 + 2  # 6 binary buttons + 2 camera bins
 MODEL_PATH = "models/ppo_bc_model"
 BC_MODEL_PATH = "models/bc_model.pth"
-
-# # Load BC model as feature extractor
-# class BCFeatureExtractor(BaseFeaturesExtractor):
-#     def __init__(self, observation_space, features_dim=128):
-#         super().__init__(observation_space, features_dim)
-#         self.net = PolicyNetwork(INPUT_DIM, OUTPUT_DIM)
-#         self.net.load_state_dict(torch.load(BC_MODEL_PATH))
-#         self.net.eval()
-
-#     def forward(self, x):
-#         return self.net.fc2(torch.relu(self.net.fc1(x)))
 
 policy_kwargs = dict(
     features_extractor_class=BCFeatureExtractor,

@@ -1,13 +1,14 @@
 import gym
 import numpy as np
 import matplotlib.pyplot as plt
-from sb3_contrib import RecurrentPPO
+from sb3_contrib import RecurrentPPO #type:ignore
+import minerl #type:ignore
+
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapperRPPO, MultiDiscreteToDictActionWrapper
-import minerl
 
-MODEL_PATH = "checkpoints/rppo_bc_4000_steps"
-# MODEL_PATH = "models/rppo_bc_model"
+# MODEL_PATH = "checkpoints/rppo_bc_4000_steps"
+MODEL_PATH = "models/rppo_bc_model"
 
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
