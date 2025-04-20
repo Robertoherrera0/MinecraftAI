@@ -94,7 +94,7 @@ def main():
         print("Loading existing BC model...")
         model.load_state_dict(torch.load("models/bc_model.pth"))
 
-    train_bc_model(model, observations, actions, num_epochs=100, batch_size=64)
+    train_bc_model(model, observations, actions, num_epochs=50, batch_size=64)
     save_model(model)
 
 
