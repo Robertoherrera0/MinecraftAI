@@ -6,7 +6,7 @@ from train_bc import PolicyNetwork
 from sklearn.metrics import mean_squared_error, r2_score
 
 # Load processed data
-def load_data(filename="processed_good.pkl"):
+def load_data(filename="processed_data/processed_good.pkl"):
     with open(filename, 'rb') as f:
         return pickle.load(f)
 
@@ -21,7 +21,7 @@ def main():
     input_dim = observations.shape[1]
     output_dim = actions.shape[1]
     model = PolicyNetwork(input_dim, output_dim)
-    model.load_state_dict(torch.load("bc_model.pth"))
+    model.load_state_dict(torch.load("models/bc_model.pth"))
     model.eval()
 
     with torch.no_grad():

@@ -8,7 +8,7 @@ import minerl #type:ignore
 from custom_reward_wrapper import CustomRewardWrapper
 from wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 
-CHECKPOINT_PATH = "checkpoints/ppo_bc_8000_steps" 
+# MODEL_PATH = "checkpoints/ppo_bc_8000_steps" 
 MODEL_PATH = "models/ppo_bc_model" 
 
 def make_env():
