@@ -49,7 +49,7 @@ def main():
         print(f"[STEP {step}] Reward: {reward:.5f} | Pitch: {pitch_bins[-1]} | Yaw: {yaw_bins[-1]}")
         step += 1
 
-        if done or step > 10_000:
+        if done or step > 15_000:
             break
 
     env.close()
