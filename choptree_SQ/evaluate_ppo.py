@@ -47,7 +47,7 @@ def main():
         print(f"[STEP {step}] Reward: {reward:.5f} | Pitch: {pitch_bins[-1]} | Yaw: {yaw_bins[-1]}")
         step += 1
 
-        if done or step > 2000: # delete "step > 3000" if you want to run longer episodes"
+        if done or step > 3000: # delete "step > 3000" if you want to run longer episodes"
             break
 
     env.close()

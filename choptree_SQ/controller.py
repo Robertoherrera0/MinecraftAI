@@ -76,7 +76,7 @@ def on_press(key):
     global exit_flag
     try:
         if key.char == 'q':
-            exit_flag = True
+            exit_flag = False
         else:
             keys_pressed.add(key.char)
     except AttributeError:
@@ -111,6 +111,8 @@ while not exit_flag and len(actions) < 1500:
     wrapped_obs = flatten_observation(obs)
     wrapped_next_obs = flatten_observation(raw_next_obs)
     wrapped_action = dict_to_multidiscrete(raw_action)
+
+    print(f"action: {wrapped_action}")
 
     actions.append({
         "obs": wrapped_obs,
