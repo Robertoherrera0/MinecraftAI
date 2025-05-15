@@ -5,6 +5,10 @@ Capstone project
 
 ** I made a google collab that I sent a while back to the discord. maybe that is something we can put in here. 
 
+
+
+**Since we didn't find any installation guides that worked/were thorough enough, we made our own (see below)!
+
 **Installing MineRL on WSL**
 https://colab.research.google.com/drive/1IUSLeHmbyKUxkNX9qvjPYGkryU15gsao?usp=sharing
 
