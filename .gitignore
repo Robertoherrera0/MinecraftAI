@@ -12,3 +12,4 @@ choptree_SQ/checkpoints/*.zip
 __pycache__/
 choptree_SQ/processed_data/*.npz
 choptree_SQ/processed_data/*.pkl
+data/processed_data/*.npz
