@@ -3,20 +3,61 @@
 Capstone project: Redstone AI Systems  
 University of Missouri - Columbia
 
-Capstone project for training reinforcement learning agents in Minecraft using the [MineRL](https://github.com/minerllabs/minerl) framework.
 
-## What This Project Does
+## Team
 
-The pipeline includes:
-- **Behavioral Cloning (BC)** for learning from human keyboard inputs  
-- **Recurrent PPO (RPPO)** for fine-tuning the agent's behavior  
-- **Custom reward shaping** to guide learning (e.g., logs collected, camera control, health penalties)  
-- A simple **GUI launcher** to collect data, train models, and evaluate results
-
-You’ll be able to collect data, train an agent, and run evaluations — all from one UI.
+- Luke Domalewski  
+- Landis Bargatze  
+- Roberto Herrera  
+- Brennan Scheel  
+- Paul Maschhoff
 
 ---
 
+This project explores how to train an AI agent to perform useful tasks in Minecraft using reinforcement learning and behavioral cloning.
+
+We originally set out to train an agent to autonomously mine diamonds. But after running into major limitations with the MineRL dataset and environment support, we pivoted to something more achievable: training an agent to chop down trees.
+
+To do this, we built our own dataset from scratch and developed a full pipeline for data collection, imitation learning, fine-tuning with reinforcement learning, and evaluation all tied together with a simple GUI.
+
+---
+
+## Project Pipeline
+
+**Data Collection**  
+- `controller.py` lets a human control the Minecraft agent  
+- Actions, observations, and rewards are recorded into custom episodes
+
+**Preprocessing**  
+- `data_processing.py` formats recorded episodes into `.npz` files for training  
+- Observations include flattened POV images and inventory vectors
+
+**Behavior Cloning (BC)**  
+- `train_bc.py`: trains a simple MLP model  
+- `train_bc_cnn.py`: trains a CNN model using visual data
+
+**Reinforcement Learning**  
+- `train_rppo_cnn.py`: fine-tunes using Recurrent PPO with the BC encoder as a feature extractor
+
+**Evaluation**  
+- `evaluate_rppo_cnn.py`: runs trained models inside the MineRL environment and displays real-time feedback
+
+**GUI**  
+- `run_pipeline.py` provides a one-click interface to run each part of the system
+
+
+---
+
+## Technologies Used
+
+- Python 3.10  
+- MineRL 1.0.2 (custom install)  
+- Stable-Baselines3 + sb3-contrib  
+- OpenCV (for image handling)  
+- Tkinter (for GUI)  
+- WSL or Ubuntu (preferred install environment)
+ ( Most packages are installed when installing MineRL in the guides below ) 
+ 
 ## Setup Guides
 
 **Installing MineRL on WSL (via Google Colab notebook)**  
@@ -141,6 +182,18 @@ This launches a simple UI where you can:
 - Evaluate your trained agent
 
 ---
+
+## What Didn’t Go as Planned
+
+- MineRL’s official dataset loaders were deprecated  
+- Older versions of MineRL were unstable and poorly documented  
+- Installation was painful — Python, Java, and Gradle versions had to be guessed  
+- We had to collect all data manually  
+- Some teammates needed to run MineRL in VMs or Docker, which caused lag  
+- Models took 30–60 minutes to train, and long runs would crash around 18,000 steps
+
+---
+
 
 ## Questions?
 
