@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import os
 
+# Load good and bad episodes from saved demonstration folders
 def load_data():
     good_episodes = []
     bad_episodes = []
@@ -33,6 +34,7 @@ def load_data():
 
     return good_episodes, bad_episodes
 
+# Format raw episode data into numpy arrays
 def preprocess_data(episodes):
     pov_list = []
     inv_list = []
@@ -73,11 +75,12 @@ def preprocess_data(episodes):
         'total_rewards': np.array(total_reward_list, dtype=np.float32)
     }
 
-
+# Save preprocessed data to compressed .npz file
 def save_processed_data(data, filename):
     np.savez(filename, **data)
     print(f" Data saved to: {filename}")
 
+# Entry point
 def main():
     print(" Loading episodes ...")
     good_eps, bad_eps = load_data()

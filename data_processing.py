@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import os
 
+# Load saved episode data from folder, split into good and bad episodes
 def load_data():
     good_episodes = []
     bad_episodes = []
@@ -33,6 +34,7 @@ def load_data():
 
     return good_episodes, bad_episodes
 
+# Preprocess episode transitions into flat arrays for training
 def preprocess_data(episodes):
     all_obs_data = []
     all_action_data = []
@@ -44,7 +46,7 @@ def preprocess_data(episodes):
     for episode in episodes:
         for transition in episode:
             pov = transition['obs']['pov'][..., :3]
-            pov = cv2.resize(pov, (64, 64)).flatten()
+            pov = cv2.resize(pov, (64, 64)).flatten()  # Flatten image to 1D
 
             inventory = np.array(transition['obs']['inv']).flatten()
             obs = np.concatenate([pov, inventory])
@@ -78,10 +80,12 @@ def preprocess_data(episodes):
         'is_good_episode': is_good_episode
     }
 
+# Save processed data to .npz format
 def save_processed_data(data, filename):
     np.savez(filename, **data)
     print(f" Data saved to: {filename}")
 
+# Entry point
 def main():
     print(" Loading episodes ...")
     good_eps, bad_eps = load_data()
