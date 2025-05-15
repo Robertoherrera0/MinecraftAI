@@ -1,6 +1,7 @@
 import gym
 import numpy as np
 
+# Custom reward wrapper for shaping behavior during training
 class CustomRewardWrapper(gym.Wrapper):
     def __init__(self, env, debug=False):
         super().__init__(env)
@@ -40,12 +41,14 @@ class CustomRewardWrapper(gym.Wrapper):
 
         return obs, reward, done, info
 
+    # Check if an item increased in inventory
     def _delta(self, key, inventory, weight=1.0):
         prev = self.prev_inventory.get(key, 0)
         now = inventory.get(key, 0)
         diff = now - prev
         return weight * diff if diff > 0 else 0
 
+    # Apply small penalty for looking too far up or down
     def _pov_look_penalty(self, obs):
         pov = obs.get("pov", None)
         if pov is None:

@@ -1,17 +1,21 @@
-
 import gym
 import numpy as np
 import matplotlib.pyplot as plt
-from stable_baselines3 import PPO #type:ignore
-import minerl #type:ignore
+from stable_baselines3 import PPO  # type: ignore
+import minerl  # type: ignore
 import sys
+
+# Fix import path for custom feature extractor (if used)
 sys.modules['bc_extractor'] = sys.modules['features.bc_extractor']
+
 from wrappers.custom_reward_wrapper import CustomRewardWrapper
 from wrappers.wrappers import FlattenObservationWrapper, MultiDiscreteToDictActionWrapper
 
-# MODEL_PATH = "checkpoints/ppo_bc_8000_steps" 
-MODEL_PATH = "models/ppo_bc_model" 
+# Path to trained PPO model
+# MODEL_PATH = "checkpoints/ppo_bc_8000_steps"
+MODEL_PATH = "models/ppo_bc_model"
 
+# Create the MineRL environment with custom wrappers
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
     env = CustomRewardWrapper(env)
@@ -19,12 +23,13 @@ def make_env():
     env = MultiDiscreteToDictActionWrapper(env)
     return env
 
+# Run evaluation loop
 def main():
     print("Loading environment and PPO model...")
     env = make_env()
     model = PPO.load(MODEL_PATH)
 
-    # get raw env for render
+    # Needed for rendering
     raw_env = env.envs[0] if hasattr(env, "envs") else env
 
     obs = env.reset()
@@ -38,23 +43,24 @@ def main():
         action, _ = model.predict(obs)
         obs, reward, done, _ = env.step(action)
 
-        raw_env.render()  
+        raw_env.render()  # show the game window
 
         total_reward += reward
         rewards.append(total_reward)
-        pitch_bins.append(action[-2])  # pitch
-        yaw_bins.append(action[-1])    # yaw
+        pitch_bins.append(action[-2])  # camera pitch
+        yaw_bins.append(action[-1])    # camera yaw
 
         print(f"[STEP {step}] Reward: {reward:.5f} | Pitch: {pitch_bins[-1]} | Yaw: {yaw_bins[-1]}")
         step += 1
 
-        if done or step > 3000: # delete "step > 3000" if you want to run longer episodes"
+        # Stop after 3000 steps or when episode ends
+        if done or step > 3000:
             break
 
     env.close()
     print(f"Evaluation done | Steps: {step} | Total reward: {total_reward}")
 
-    # --- Plotting ---
+    # Plot total reward and camera movements
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)

@@ -7,20 +7,23 @@ import minerl  # type: ignore
 from choptree.wrappers.custom_reward_wrapper import CustomRewardWrapperCNN
 from choptree.wrappers.wrappers import MultiDiscreteToDictActionWrapper
 
-# Make sure this path matches your trained CNN RPPO model
+# Path to the trained CNN RPPO model
 MODEL_PATH = "choptree/models/rppo_bc_model_cnn"
 
+# Create and wrap the environment
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
     env = CustomRewardWrapperCNN(env)
     env = MultiDiscreteToDictActionWrapper(env)
     return env
 
+# Run evaluation
 def main():
     print("Loading environment and Recurrent PPO model...")
     env = make_env()
     model = RecurrentPPO.load(MODEL_PATH)
 
+    # For rendering
     raw_env = env.envs[0] if hasattr(env, "envs") else env
 
     obs = env.reset()
@@ -30,8 +33,8 @@ def main():
     pitch_bins = []
     step = 0
 
-    lstm_states = None
-    episode_starts = np.ones((1,), dtype=bool)
+    lstm_states = None  # for RPPO memory
+    episode_starts = np.ones((1,), dtype=bool)  # tells model when episode starts
 
     while True:
         action, lstm_states = model.predict(obs, state=lstm_states, episode_start=episode_starts)
@@ -39,7 +42,7 @@ def main():
 
         raw_env.render()
 
-        episode_starts = np.array([done])
+        episode_starts = np.array([done])  # reset memory if done
         total_reward += reward
         rewards.append(total_reward)
         pitch_bins.append(action[-2])  # last two elements: camera bins
@@ -53,7 +56,7 @@ def main():
     env.close()
     print(f"Evaluation done | Steps: {step} | Total reward: {total_reward}")
 
-    # --- Plotting ---
+    # Plot rewards and camera control values
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)

@@ -1,15 +1,18 @@
 import numpy as np
 
+# Load data
 filename = "data/processed_data/processed_good_cnn.npz"
 start = 50000
 end = 50001
 
 data = np.load(filename)
 
+# Show keys
 print("\nLoaded keys from file:")
 for key in data.files:
     print(f" - {key}: shape = {data[key].shape}, dtype = {data[key].dtype}")
 
+# Show samples
 print("\nSample steps:")
 for i in range(start, min(end, len(data['actions']))):
     print(f"\nStep {i}:")

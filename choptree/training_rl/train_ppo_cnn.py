@@ -13,23 +13,24 @@ import minerl  # type: ignore
 MODEL_PATH = "../models/ppo_bc_model"
 BC_MODEL_PATH = "../models/bc_model.pth"
 
-# PPO Policy Settings
+# PPO policy setup using BC-based feature extractor
 policy_kwargs = dict(
     features_extractor_class=BCFeatureExtractor,
     features_extractor_kwargs=dict(features_dim=128),
     net_arch=dict(pi=[64], vf=[64])
 )
 
-# Make Environment
+# Create and wrap the MineRL environment
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
     env = CustomRewardWrapper(env)
     env = MultiDiscreteToDictActionWrapper(env)
     return env
 
+# Create a vectorized environment with one instance
 vec_env = make_vec_env(make_env, n_envs=1)
 
-# Stop Training Callback
+# Callback to stop training after a set number of steps
 class Stop(BaseCallback):
     def __init__(self, max_steps, verbose=0):
         super().__init__(verbose)
@@ -38,19 +39,20 @@ class Stop(BaseCallback):
     def _on_step(self) -> bool:
         return self.num_timesteps < self.max_steps
 
-# Save Checkpoints
+# Save model checkpoints periodically during training
 checkpoint_callback = CheckpointCallback(
     save_freq=4000,
     save_path="../models/checkpoints/",
     name_prefix="ppo_bc"
 )
 
+# Combine multiple callbacks
 callback = CallbackList([
     Stop(max_steps=17500),
     checkpoint_callback
 ])
 
-# Train PPO with BC Feature Extractor
+# Train or load PPO model using BC-based features
 def train_ppo_model():
     if os.path.exists(MODEL_PATH + ".zip"):
         print("\nLoading existing PPO model...\n")
@@ -74,6 +76,7 @@ def train_ppo_model():
     model.save(MODEL_PATH)
     print(f"PPO fine-tuning done. Model saved to: {MODEL_PATH}")
 
+# Entry point
 def main():
     train_ppo_model()
 

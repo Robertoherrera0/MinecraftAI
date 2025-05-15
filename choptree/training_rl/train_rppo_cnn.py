@@ -16,6 +16,7 @@ MODEL_PATH = "choptree/models/rppo_bc_model_cnn"
 BC_MODEL_PATH = "choptree/models/bc_model_cnn.pth"
 
 # --- Policy Configuration ---
+# Recurrent PPO setup using the BC-trained CNN as the feature extractor
 policy_kwargs = dict(
     features_extractor_class=BCFeatureExtractorCNN,
     features_extractor_kwargs=dict(features_dim=128),
@@ -26,6 +27,7 @@ policy_kwargs = dict(
 )
 
 # --- Environment Setup ---
+# Wrap MineRL environment with reward shaping and action formatting
 def make_env():
     env = gym.make("MineRLObtainDiamondShovel-v0")
     env = CustomRewardWrapperCNN(env)
@@ -34,6 +36,7 @@ def make_env():
     print(env.observation_space)
     return env
 
+# Use a single vectorized env for training
 vec_env = make_vec_env(make_env, n_envs=1)
 
 # --- Callback for Early Stopping ---
@@ -45,18 +48,21 @@ class Stop(BaseCallback):
     def _on_step(self) -> bool:
         return self.num_timesteps < self.max_steps
 
+# Save checkpoints during training
 checkpoint_callback = CheckpointCallback(
     save_freq=4000,
     save_path="choptree/models/checkpoints/",
     name_prefix="rppo_bc_cnn"
 )
 
+# Combine stopping and checkpoint logic
 callback = CallbackList([
     Stop(max_steps=17500),
     checkpoint_callback
 ])
 
 # --- Training Loop ---
+# Train RPPO using the CNN-based BC encoder
 def train_rppo_model():
     if os.path.exists(MODEL_PATH + ".zip"):
         print("\nLoading existing RPPO model...\n")
@@ -81,6 +87,7 @@ def train_rppo_model():
     model.save(MODEL_PATH)
     print(f"Recurrent PPO training done. Model saved to: {MODEL_PATH}")
 
+# Entry point
 def main():
     train_rppo_model()
 

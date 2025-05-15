@@ -16,10 +16,9 @@ with this
 from reward_wrapper import CustomRewardWrapper
 ...
 env = CustomRewardWrapper(base_env, debug=True)
-
-
 """
 
+# Basic custom reward wrapper for debugging/log collection
 class CustomRewardWrapper(gym.Wrapper):
     def __init__(self, env, debug=False):
         super().__init__(env)
@@ -56,6 +55,7 @@ class CustomRewardWrapper(gym.Wrapper):
 
         return obs, reward, done, info
 
+    # Track increase in inventory items
     def _delta(self, key, inventory, weight=1.0):
         prev = self.prev_inventory.get(key, 0)
         now = inventory.get(key, 0)
@@ -63,6 +63,7 @@ class CustomRewardWrapper(gym.Wrapper):
         return weight * diff if diff > 0 else 0
 
 
+# RPPO-specific reward shaping with camera-based feedback
 class CustomRewardWrapperRPPO(gym.Wrapper):
     def __init__(self, env, debug=False):
         super().__init__(env)
@@ -134,6 +135,7 @@ class CustomRewardWrapperRPPO(gym.Wrapper):
 
         return obs, reward, done, info
 
+    # Track increase in tree-related inventory items
     def _delta(self, key, inventory, weight=1.0):
         prev = self.prev_inventory.get(key, 0)
         now = inventory.get(key, 0)
@@ -141,6 +143,7 @@ class CustomRewardWrapperRPPO(gym.Wrapper):
         return weight * diff if diff > 0 else 0
 
 
+# CNN-compatible reward wrapper with resized image and simplified obs
 class CustomRewardWrapperCNN(gym.Wrapper):
     def __init__(self, env, debug=False):
         super().__init__(env)
@@ -217,12 +220,14 @@ class CustomRewardWrapperCNN(gym.Wrapper):
 
         return self._convert_obs(raw_obs), reward, done, info
 
+    # Track increase in tree items
     def _delta(self, key, inventory, weight=1.0):
         prev = self.prev_inventory.get(key, 0)
         now = inventory.get(key, 0)
         diff = now - prev
         return weight * diff if diff > 0 else 0
 
+    # Resize image and build simplified observation dict
     def _convert_obs(self, raw_obs):
         pov = raw_obs["pov"][..., :3]  # RGB only
         pov = cv2.resize(pov, (64, 64), interpolation=cv2.INTER_AREA).astype(np.uint8)  # <-- RESIZE HERE

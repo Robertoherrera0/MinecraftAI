@@ -8,13 +8,15 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
-import os 
+import os
 
+# Load saved training data
 def load_processed_data(filename="../../data/processed_data/processed_good.npz"):
     data = np.load(filename)
     print("Loaded processed data.")
     return data
 
+# Simple MLP that maps observations to actions
 class PolicyNetwork(nn.Module):
     def __init__(self, input_dim, output_dim):
         super().__init__()
@@ -27,6 +29,7 @@ class PolicyNetwork(nn.Module):
         x = torch.relu(self.fc2(x))
         return self.fc3(x)
 
+# Dataset using flat observation -> action pairs
 class DemoDataset(Dataset):
     def __init__(self, observations, actions):
         self.observations = observations
@@ -40,6 +43,7 @@ class DemoDataset(Dataset):
         action = torch.tensor(self.actions[idx], dtype=torch.float32)
         return obs, action
 
+# Train the model using MSE loss
 def train_bc_model(model, observations, actions_data, num_epochs=200, batch_size=64):
     demo_dataset = DemoDataset(observations, actions_data)
     dataloader = DataLoader(demo_dataset, batch_size=batch_size, shuffle=True)
@@ -62,7 +66,7 @@ def train_bc_model(model, observations, actions_data, num_epochs=200, batch_size
         epoch_losses.append(avg_loss)
         print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {avg_loss:.6f}")
 
-    # Plot log-scale loss
+    # Plot loss over time
     plt.figure()
     plt.semilogy(epoch_losses)
     plt.xlabel("Epoch")
@@ -72,16 +76,18 @@ def train_bc_model(model, observations, actions_data, num_epochs=200, batch_size
     plt.tight_layout()
     plt.show()
 
+# Save model weights to file
 def save_model(model, filename="../models/bc_model.pth"):
     torch.save(model.state_dict(), filename)
     print(f"Model saved to {filename}")
 
+# Run everything
 def main():
     data = load_processed_data()
     observations = np.array(data['observations'])
     actions = np.array(data['actions'])
 
-    # Shape enforcement
+    # Flatten inputs/outputs just in case
     observations = observations.reshape(len(observations), -1)
     actions = actions.reshape(len(actions), -1)
     print("Obs shape:", observations.shape)
@@ -91,13 +97,15 @@ def main():
     output_dim = actions.shape[1]
 
     model = PolicyNetwork(input_dim, output_dim)
+
+    # Load previous weights if available
     if os.path.exists("models/bc_model.pth"):
         print("Loading existing BC model...")
         model.load_state_dict(torch.load("models/bc_model.pth"))
 
+    # Train and save model
     train_bc_model(model, observations, actions, num_epochs=50, batch_size=64)
     save_model(model)
-
 
 if __name__ == "__main__":
     main()
