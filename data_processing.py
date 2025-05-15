@@ -7,7 +7,7 @@ import os
 def load_data():
     good_episodes = []
     bad_episodes = []
-    root_dir = "human-demonstrations"
+    root_dir = "data/human-demonstrations"
 
     for episode_dir in sorted(os.listdir(root_dir)):
         full_path = os.path.join(root_dir, episode_dir)
@@ -95,12 +95,12 @@ def main():
     if good_eps:
         print("Processing good episodes ...")
         processed_good = preprocess_data(good_eps)
-        save_processed_data(processed_good, "processed_data/processed_good.npz")
+        save_processed_data(processed_good, "data/processed_data/processed_good.npz")
 
     if bad_eps:
         print("Processing bad episodes ...")
         processed_bad = preprocess_data(bad_eps)
-        save_processed_data(processed_bad, "processed_data/processed_bad.npz")
+        save_processed_data(processed_bad, "data/processed_data/processed_bad.npz")
 
 if __name__ == "__main__":
     main()
